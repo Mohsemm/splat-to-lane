@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+*.ckpt
+*.ply
+frames*/
+raw/
+outputs/
+lane/
