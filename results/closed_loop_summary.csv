@@ -1,0 +1,7 @@
+world,set,successes,runs,mean_final_abs_offset_m
+A,W,0,10,11.93
+A,G,10,10,0.03
+A,G2,10,10,0.02
+B,W,0,10,12.7
+B,G,10,10,0.02
+B,G2,10,10,0.03
