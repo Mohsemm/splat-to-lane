@@ -1,0 +1,2 @@
+G2_20k G2 lane/renders_G220k 30
+G_20k G lane/renders_G20k 30

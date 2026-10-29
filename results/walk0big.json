@@ -1,0 +1,17 @@
+{
+  "experiment_name": "street_walk0_big",
+  "method_name": "splatfacto",
+  "checkpoint": "outputs/street_walk0_big/splatfacto/2026-10-29_045506/nerfstudio_models/step-000029999.ckpt",
+  "results": {
+    "psnr": 19.941722869873047,
+    "psnr_std": 2.7313151359558105,
+    "ssim": 0.5452215671539307,
+    "ssim_std": 0.11274615675210953,
+    "lpips": 0.4200049340724945,
+    "lpips_std": 0.10166974365711212,
+    "num_rays_per_sec": 2577079.5,
+    "num_rays_per_sec_std": 139712.53125,
+    "fps": 0.6998367309570312,
+    "fps_std": 0.0379406102001667
+  }
+}
