@@ -25,7 +25,9 @@ Error on real frames vs distance from the filmed path, lower is better.
 ## 3D world and video
 
 - **3D.** `exports/street_all_1080b/splat_yup.ply` (3.03M gaussians, 751 MB, y-up for SuperSplat). Not in git, `*.ply` is ignored. SuperSplat link coming.
-- **Video.** Closed loop replayed in the big splat world at 1080p, render net on the left vs warp net on the right, ~8 s (`lane/results/demo_hd.mp4` on the build machine, 52 MB, not in git).
+- **Video.** Closed loop replayed in the big splat world, render net on the left vs warp net on the right, both starting 2.8 m off with the lane target in the road (1.5 m). The render net steers back, the warp net doesn't. Full quality clip in [`results/media/demo_small.mp4`](results/media/demo_small.mp4).
+
+![render net vs warp net driving](results/media/demo.gif)
 
 ## how it works
 
