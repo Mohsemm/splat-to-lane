@@ -88,6 +88,14 @@ So R is near perfect where it was filmed but falls apart past it (149 cm at 3 m)
 - World B and R saw walk 2, so their 1.93 m numbers aren't held out (marked *).
 - Both walk 0 clips point slightly right, so the splat covers the left edge less. Parked cars may have moved between passes.
 
+## prior art
+
+- **PilotNet** ([NVIDIA, 2020](https://arxiv.org/pdf/2010.08776)) trained steering on off centre views made by 2D warps under a flat world assumption. That's baseline W here. It was never compared against 3D renders with real off path ground truth.
+- **HUGSIM** ([2024](https://arxiv.org/abs/2412.01718)) is a closed loop driving simulator on 3DGS from KITTI-360/Waymo/nuScenes, built on car rig datasets.
+- **RAD** ([Horizon Robotics, 2025](https://arxiv.org/abs/2502.13144)) does RL driving in 3DGS worlds. It needs large multi camera logs and an RL farm.
+- **Para-Lane** ([3DV 2025](https://arxiv.org/abs/2502.15635)) and **EUVS** ([ICCV 2025](https://openaccess.thecvf.com/content/ICCV2025/papers/Han_Extrapolated_Urban_View_Synthesis_Benchmark_ICCV_2025_paper.pdf)) measure how 3DGS degrades when you move sideways, using car rig data. Here it's a phone, and the question is what that degradation does to a model trained on it.
+- **MTGS** ([2025](https://arxiv.org/abs/2503.12552)) shows several traversals improve the 3D model. Here a second walk at 2 m buys +1.7 to 2.0 dB at the unseen offsets.
+
 ## how to reproduce
 
 All scripts run from one flat working directory (copy `scripts/`, `train/` and `eval/` into it) inside the `ghcr.io/nerfstudio-project/nerfstudio` container, run as `docker run --gpus all -u $(id -u) -e HOME=/workspace -e USER=… -e TORCHDYNAMO_DISABLE=1 -v $PWD:/workspace`. The `pipeline/run_*.sh` files are the exact job chains that produced every number here, with cooldowns and temperature logs. Run order
@@ -102,3 +110,13 @@ All scripts run from one flat working directory (copy `scripts/`, `train/` and `
 
 `results/` has every CSV behind the tables plus `results/training_curves/`. `results/SUMMARY.md` is the auto generated run summary.
 
+## sources
+
+Everything here comes from one of these or from the CSVs in `results/`. All footage is mine, 4 parallel phone walks on Robert St, Toronto, filmed 2026-10-28. No public dataset was used.
+
+- Camera poses, COLMAP. J. L. Schönberger and J.-M. Frahm, "Structure-from-Motion Revisited", CVPR 2016. [colmap.github.io](https://colmap.github.io/)
+- 3D worlds, B. Kerbl et al., "3D Gaussian Splatting for Real-Time Radiance Field Rendering", SIGGRAPH 2023. [arXiv:2308.04079](https://arxiv.org/abs/2308.04079)
+- Training and rendering, M. Tancik et al., "Nerfstudio: A Modular Framework for Neural Radiance Field Development", SIGGRAPH 2023. [arXiv:2302.04264](https://arxiv.org/abs/2302.04264), with V. Ye et al., "gsplat: An Open-Source Library for Gaussian Splatting", 2024. [arXiv:2409.06765](https://arxiv.org/abs/2409.06765)
+- Image quality metric LPIPS, R. Zhang et al., "The Unreasonable Effectiveness of Deep Features as a Perceptual Metric", CVPR 2018. [arXiv:1801.03924](https://arxiv.org/abs/1801.03924)
+- 2D warp baseline (W), M. Bojarski et al., "End to End Learning for Self-Driving Cars", NVIDIA 2016. [arXiv:1604.07316](https://arxiv.org/abs/1604.07316), plus the PilotNet follow up above.
+- Closed loop sim in a neural world, Z. Yang et al., "UniSim: A Neural Closed-Loop Sensor Simulator", CVPR 2023. [arXiv:2308.01898](https://arxiv.org/abs/2308.01898)
