@@ -28,7 +28,7 @@ Error on real frames vs distance from the filmed path, lower is better.
 
 ## 3D world and video
 
-- **3D.** `exports/street_all_1080b/splat_yup.ply` (3.03M gaussians, 751 MB, y-up for SuperSplat). Not in git, `*.ply` is ignored. SuperSplat link coming.
+- **3D.** You can fly around the whole street in your browser [in SuperSplat](https://superspl.at/editor?load=https://huggingface.co/datasets/mohsem/splat2lane-street/resolve/main/street.compressed.ply) (3.03M gaussians, compressed to 177 MB so give it a minute to load). The file is on [Hugging Face](https://huggingface.co/datasets/mohsem/splat2lane-street) since it's too big for git.
 - **Video.** Closed loop replayed in the big splat world, render net on the left vs warp net on the right, both starting 2.8 m off with the lane target in the road (1.5 m). Watch where each one ends up. The clip at the top is a smaller version of [`results/media/demo_small.mp4`](results/media/demo_small.mp4).
 
 ## how it works
