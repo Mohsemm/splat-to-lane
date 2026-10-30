@@ -2,6 +2,10 @@
 
 Can a lane keeping net learn views nobody filmed if you train it inside a 3D copy of the street made from one phone video?
 
+![render net vs warp net driving](results/media/demo.gif)
+
+*Left, the net trained on 3D renders. Right, the same net trained on NVIDIA style 2D warps. Both start 2.8 m off and try to get back to a lane 1.5 m into the road.*
+
 ## the idea
 
 A self driving camera has to know how far it is from the line it should be on. To learn that it needs pictures from spots where the car has drifted sideways, and nobody wants to film a car drifting. So people fake them.
@@ -25,9 +29,7 @@ Error on real frames vs distance from the filmed path, lower is better.
 ## 3D world and video
 
 - **3D.** `exports/street_all_1080b/splat_yup.ply` (3.03M gaussians, 751 MB, y-up for SuperSplat). Not in git, `*.ply` is ignored. SuperSplat link coming.
-- **Video.** Closed loop replayed in the big splat world, render net on the left vs warp net on the right, both starting 2.8 m off with the lane target in the road (1.5 m). Watch where each one ends up. Full quality clip in [`results/media/demo_small.mp4`](results/media/demo_small.mp4).
-
-![render net vs warp net driving](results/media/demo.gif)
+- **Video.** Closed loop replayed in the big splat world, render net on the left vs warp net on the right, both starting 2.8 m off with the lane target in the road (1.5 m). Watch where each one ends up. The clip at the top is a smaller version of [`results/media/demo_small.mp4`](results/media/demo_small.mp4).
 
 ## how it works
 
