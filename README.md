@@ -16,7 +16,7 @@ To check who's right I filmed real walks 1, 2 and 3 m to the side of the first o
 
 On real footage 3 m off the filmed path, the net trained on 6,000 splat renders from walks 0 + 2 (G2) is off by **79.1 ± 14.2 cm**. The same net trained on 6,000 PilotNet style warps (W) is off by **176.0 ± 9.8 cm**. With 20,000 images and 30 epochs each, renders get to **27.0 ± 1.7 cm** (G_20k) and warps only to **134.8 ± 9.2 cm** (W_20k), so about 5x better with the same amount of data. Everything is mean ± std over 3 seeds.
 
-![error vs offset](results/plots/error_vs_offset_seeds.png)
+![error vs offset](results/plots/sheet_error_vs_offset.png)
 
 ## 3D world and video
 
@@ -39,6 +39,8 @@ On real footage 3 m off the filmed path, the net trained on 6,000 splat renders 
    | B (walks 0 + 2) | 23.14 | 24.55 | 22.06 | (train) | 19.47 |
 
    World A loses ~7 dB going from the filmed path to 3 m. Adding a walk at 2 m gains 1.7 dB at the unseen 1 m and 2.0 dB at the unseen 3 m. Overall A is 19.94 dB / SSIM 0.544 / LPIPS 0.453 and B is 21.59 / 0.611 / 0.402.
+
+   ![render quality vs offset](results/plots/sheet_quality.png)
 5. **Training data for free** (`scripts/render_offsets.py`). Render the world at a random walk 0 position with offset U[0, 3] m and heading U[−10°, 15°], at 480x270. The label is just the pose you rendered from, 6,000 views take ~70 s.
 6. **Lane net** (`train/train_offset.py`). ImageNet resnet18 that regresses (offset, heading) with L1 loss, AdamW and one cycle LR, 15 epochs (30 for the 20k sets). Every set includes the real walk 0 frames. The sets are
    - **W**, PilotNet style 2D warps of the real walk 0 frames (`scripts/warp2d.py`). Flat ground homography below the horizon, rotation only above it, phone height 1.4 m.
@@ -80,13 +82,26 @@ So R is near perfect where it was filmed but falls apart past it (149 cm at 3 m)
 | in the road (1.5 m) | A | 4/10 | 10/10 | 10/10 |
 | in the road (1.5 m) | B | 2/10 | 10/10 | 10/10 |
 
-![closed loop, target 1.5 m](results/plots/cl_road_all.png)
+![closed loop, target 1.5 m](results/plots/sheet_closed_loop.png)
 
 ## checks
 
 - **Strict world (G_strict).** The splat starts from COLMAP points that walks 1-3 also helped triangulate. Rebuilding world A from the 158,781 points seen by at least 2 walk 0 cameras (out of 288,801) gives 100.5 cm at 3 m vs 95.5 ± 10.3 for G. That's inside the seed spread, so no sign of leakage.
 - **Bigger splat model.** splatfacto-big at 1440p didn't help the nets (G_big 113.5 cm, G2_big 88.6 cm at 3 m, 1 seed each), even though its held out PSNR was the same or better.
 - **W's phone height guess.** W at 1.2 m gets 166.2 cm at 3 m. At 1.6 m it gets 4.0 / 41.8 / 155.3 cm at 1 / 2 / 3 m (1 seed). The warp baseline depends on a number you can't measure from the video.
+
+### half street
+
+Does it work on a stretch of street the net never saw? I built a world from the first half of the street only, trained on 20,000 renders from it (30 epochs, 1 seed, G_half) and tested on the real frames from the second half. The other rows are the full street nets scored on the same second half frames (`results/half_street.csv`, error in cm).
+
+| net | n | w0 (0 m) | w1 (0.93 m) | w2 (1.93 m) | w3 (3.07 m) |
+|---|---|---|---|---|---|
+| G_half | 1 | 0.7 | 4.5 | 32.1 | 100.1 |
+| G_20k | 3 | 0.6 ± 0.1 | 3.0 ± 1.5 | 3.7 ± 0.8 | 30.4 ± 2.0 |
+| G | 3 | 1.9 ± 0.1 | 25.6 ± 1.6 | 53.6 ± 5.9 | 100.9 ± 11.1 |
+| W | 3 | 1.9 ± 0.6 | 23.0 ± 4.7 | 71.7 ± 9.9 | 186.6 ± 8.5 |
+
+Near the path it carries over, at 1 m it's within 1.5x of the net that saw the whole street. Further out it doesn't, at 3 m it's 3.3x worse than G_20k, though still about 1.9x better than W. So handling new streets probably needs worlds from more than one street.
 
 ## limitations
 
@@ -95,6 +110,7 @@ So R is near perfect where it was filmed but falls apart past it (149 cm at 3 m)
 - Offsets come from COLMAP, not a tape measure. The metric scale is fitted so the walk spacing matches the nominal 1/2/3 m (`scripts/lane_common.py`).
 - The closed loop runs inside the splat, which is the kind of image the G nets trained on. That favours G since W never saw render artefacts. The real frame table is the fair comparison.
 - World B, R and RG2 saw walk 2, so their 1.93 m numbers aren't held out (marked *).
+- New streets aren't really tested. A net trained on half the street holds up near the path on the other half but is 3.3x worse than the full street net at 3 m (see half street).
 - Both walk 0 clips point slightly right, so the splat covers the left edge less. Parked cars may have moved between passes.
 
 ## prior art
