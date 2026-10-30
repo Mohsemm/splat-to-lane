@@ -6,6 +6,8 @@ Can a lane keeping net learn views nobody filmed if you train it inside a 3D cop
 
 *Left, the net trained on 3D renders. Right, the same net trained on NVIDIA style 2D warps. Both start 2.8 m off and try to get back to a lane 1.5 m into the road.*
 
+The whole project in 60 seconds, in HD, is [here](results/media/splat2lane_60s.mp4).
+
 ## the idea
 
 A self driving camera has to know how far it is from the line it should be on. To learn that it needs pictures from spots where the car has drifted sideways, and nobody wants to film a car drifting. So people fake them.
