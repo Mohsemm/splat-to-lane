@@ -2,6 +2,16 @@
 
 Can a lane keeping net learn views nobody filmed if you train it inside a 3D copy of the street made from one phone video?
 
+## the idea
+
+A self driving camera has to know how far it is from the line it should be on. To learn that it needs pictures from spots where the car has drifted sideways, and nobody wants to film a car drifting. So people fake them.
+
+NVIDIA's way (PilotNet) is to take a normal frame and warp it in 2D so it looks shifted. It's cheap but the image is flat, so close stuff and far stuff move wrong. I call that W.
+
+My way is to turn a phone walk down the street into a 3D gaussian splat and render new pictures from wherever I want. That's G (world built from walk 0 only) and G2 (walks 0 and 2).
+
+To check who's right I filmed real walks 1, 2 and 3 m to the side of the first one. Those are the answer key. Same small net (resnet18), trained on each kind of fake picture, then tested on the real side frames.
+
 ## tl;dr
 
 On real footage 3 m off the filmed path, the net trained on 6,000 splat renders from walks 0 + 2 (G2) is off by **79.1 ± 14.2 cm**. The same net trained on 6,000 PilotNet style warps (W) is off by **176.0 ± 9.8 cm**. With 20,000 renders and 30 epochs, G_20k gets to **27.0 ± 1.7 cm**. The matched warp run (W_20k) is still going, so that one isn't a fair comparison yet. Everything is mean ± std over 3 seeds.
