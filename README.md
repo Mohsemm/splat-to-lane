@@ -10,7 +10,7 @@ NVIDIA's way (PilotNet) is to take a normal frame and warp it in 2D so it looks 
 
 My way is to turn a phone walk down the street into a 3D gaussian splat and render new pictures from wherever I want. That's G (world built from walk 0 only) and G2 (walks 0 and 2).
 
-To check who's right I filmed real walks 1, 2 and 3 m to the side of the first one. Those are the answer key. Same small net (resnet18), trained on each kind of fake picture, then tested on the real side frames.
+To check who's right I filmed real walks 1, 2 and 3 m to the side of the first one. Those are the answer key. I trained the same small net (resnet18) on each kind of fake picture and then tested it on the real side frames.
 
 ## tl;dr
 
@@ -121,13 +121,13 @@ Near the path it carries over, at 1 m it's within 1.5x of the net that saw the w
 
 ## limitations
 
-- One street, one late morning. About 50 minutes of filming (11:20 to 12:10), no other weather, light or street.
-- Walking, not driving. The phone was at chest height (~1.3 m) and moving at walking speed. A car camera sits at a different height and moves faster.
-- Offsets come from COLMAP, not a tape measure. The metric scale is fitted so the walk spacing matches the nominal 1/2/3 m (`scripts/lane_common.py`).
+- Everything comes from one street filmed in one late morning, about 50 minutes of filming from 11:20 to 12:10, so I haven't tested other weather, light or streets.
+- I was walking, not driving, with the phone at chest height (~1.3 m) and moving at walking speed, while a car camera sits at a different height and moves a lot faster.
+- The offsets come from COLMAP and not a tape measure, and the metric scale is fitted so the walk spacing matches the planned 1/2/3 m (`scripts/lane_common.py`).
 - The closed loop runs inside the splat, which is the kind of image the G nets trained on. That favours G since W never saw render artefacts. The real frame table is the fair comparison.
 - World B, R and RG2 saw walk 2, so their 1.93 m numbers aren't held out (marked *).
 - New streets aren't really tested. A net trained on half the street holds up near the path on the other half but is 3.3x worse than the full street net at 3 m (see half street).
-- Both walk 0 clips point slightly right, so the splat covers the left edge less. Parked cars may have moved between passes.
+- Both walk 0 clips point slightly right, so the splat covers the left edge less, and some parked cars may have moved between passes.
 
 ## prior art
 
