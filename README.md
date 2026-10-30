@@ -14,7 +14,11 @@ To check who's right I filmed real walks 1, 2 and 3 m to the side of the first o
 
 ## tl;dr
 
-On real footage 3 m off the filmed path, the net trained on 6,000 splat renders from walks 0 + 2 (G2) is off by **79.1 ± 14.2 cm**. The same net trained on 6,000 PilotNet style warps (W) is off by **176.0 ± 9.8 cm**. With 20,000 images and 30 epochs each, renders get to **27.0 ± 1.7 cm** (G_20k) and warps only to **134.8 ± 9.2 cm** (W_20k), so about 5x better with the same amount of data. Everything is mean ± std over 3 seeds.
+On real footage 3 m off the filmed path, the net trained on 6,000 splat renders from walks 0 + 2 (G2) is off by **79.1 ± 14.2 cm**. The same net trained on 6,000 PilotNet style warps (W) is off by **176.0 ± 9.8 cm**. With 20,000 images and 30 epochs each, renders get to **27.0 ± 1.7 cm** (G_20k) and warps only to **134.8 ± 9.2 cm** (W_20k). Everything is mean ± std over 3 seeds.
+
+**So with the same amount of data, training on the 3D renders makes the net about 5x more accurate than NVIDIA's 2D warps (27 cm vs 135 cm off at 3 m).**
+
+Error on real frames vs distance from the filmed path, lower is better.
 
 ![error vs offset](results/plots/sheet_error_vs_offset.png)
 
@@ -39,6 +43,10 @@ On real footage 3 m off the filmed path, the net trained on 6,000 splat renders 
    | B (walks 0 + 2) | 23.14 | 24.55 | 22.06 | (train) | 19.47 |
 
    World A loses ~7 dB going from the filmed path to 3 m. Adding a walk at 2 m gains 1.7 dB at the unseen 1 m and 2.0 dB at the unseen 3 m. Overall A is 19.94 dB / SSIM 0.544 / LPIPS 0.453 and B is 21.59 / 0.611 / 0.402.
+
+   **So the further you move from where you filmed, the worse the renders look, and one extra walk makes the unfilmed views noticeably better.**
+
+   Render quality (PSNR) vs distance, higher is better.
 
    ![render quality vs offset](results/plots/sheet_quality.png)
 5. **Training data for free** (`scripts/render_offsets.py`). Render the world at a random walk 0 position with offset U[0, 3] m and heading U[−10°, 15°], at 480x270. The label is just the pose you rendered from, 6,000 views take ~70 s.
@@ -73,6 +81,8 @@ On real footage 3 m off the filmed path, the net trained on 6,000 splat renders 
 
 So R is near perfect where it was filmed but falls apart past it (149 cm at 3 m). Mixing R's real frames with G2's renders (RG2) stays accurate near the path and cuts the 3 m error to 47 cm.
 
+**So past 1 m the renders beat the warps at every distance, and just filming more (R) only helps where you actually filmed.**
+
 **Closed loop** (inside the splat worlds, 10 starts per net per world, `results/closed_loop_summary.csv`, `results/cl_road_summary.csv`)
 
 | target | world | W (2D warps) | G | G2 |
@@ -82,13 +92,17 @@ So R is near perfect where it was filmed but falls apart past it (149 cm at 3 m)
 | in the road (1.5 m) | A | 4/10 | 10/10 | 10/10 |
 | in the road (1.5 m) | B | 2/10 | 10/10 | 10/10 |
 
+**So the render nets got back into the lane every time (40/40 runs), the warp net only 6/40.**
+
+Runs ending in the lane (target 1.5 m, out of 10), higher is better.
+
 ![closed loop, target 1.5 m](results/plots/sheet_closed_loop.png)
 
 ## checks
 
-- **Strict world (G_strict).** The splat starts from COLMAP points that walks 1-3 also helped triangulate. Rebuilding world A from the 158,781 points seen by at least 2 walk 0 cameras (out of 288,801) gives 100.5 cm at 3 m vs 95.5 ± 10.3 for G. That's inside the seed spread, so no sign of leakage.
-- **Bigger splat model.** splatfacto-big at 1440p didn't help the nets (G_big 113.5 cm, G2_big 88.6 cm at 3 m, 1 seed each), even though its held out PSNR was the same or better.
-- **W's phone height guess.** W at 1.2 m gets 166.2 cm at 3 m. At 1.6 m it gets 4.0 / 41.8 / 155.3 cm at 1 / 2 / 3 m (1 seed). The warp baseline depends on a number you can't measure from the video.
+- **Strict world (G_strict).** The splat starts from COLMAP points that walks 1-3 also helped triangulate. Rebuilding world A from the 158,781 points seen by at least 2 walk 0 cameras (out of 288,801) gives 100.5 cm at 3 m vs 95.5 ± 10.3 for G. That's inside the seed spread, so **no sign of leakage**.
+- **Bigger splat model.** splatfacto-big at 1440p **didn't help the nets** (G_big 113.5 cm, G2_big 88.6 cm at 3 m, 1 seed each), even though its held out PSNR was the same or better.
+- **W's phone height guess.** W at 1.2 m gets 166.2 cm at 3 m. At 1.6 m it gets 4.0 / 41.8 / 155.3 cm at 1 / 2 / 3 m (1 seed). **The warp baseline depends on a number you can't measure from the video.**
 
 ### half street
 
@@ -101,7 +115,7 @@ Does it work on a stretch of street the net never saw? I built a world from the 
 | G | 3 | 1.9 ± 0.1 | 25.6 ± 1.6 | 53.6 ± 5.9 | 100.9 ± 11.1 |
 | W | 3 | 1.9 ± 0.6 | 23.0 ± 4.7 | 71.7 ± 9.9 | 186.6 ± 8.5 |
 
-Near the path it carries over, at 1 m it's within 1.5x of the net that saw the whole street. Further out it doesn't, at 3 m it's 3.3x worse than G_20k, though still about 1.9x better than W. So handling new streets probably needs worlds from more than one street.
+Near the path it carries over, at 1 m it's within 1.5x of the net that saw the whole street. Further out it doesn't, at 3 m it's 3.3x worse than G_20k, though still about 1.9x better than W. **So it works near the path on new parts of the street, but handling new streets far out probably needs worlds from more than one street.**
 
 ## limitations
 
