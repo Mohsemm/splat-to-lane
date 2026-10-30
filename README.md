@@ -14,7 +14,7 @@ To check who's right I filmed real walks 1, 2 and 3 m to the side of the first o
 
 ## tl;dr
 
-On real footage 3 m off the filmed path, the net trained on 6,000 splat renders from walks 0 + 2 (G2) is off by **79.1 ± 14.2 cm**. The same net trained on 6,000 PilotNet style warps (W) is off by **176.0 ± 9.8 cm**. With 20,000 renders and 30 epochs, G_20k gets to **27.0 ± 1.7 cm**. The matched warp run (W_20k) is still going, so that one isn't a fair comparison yet. Everything is mean ± std over 3 seeds.
+On real footage 3 m off the filmed path, the net trained on 6,000 splat renders from walks 0 + 2 (G2) is off by **79.1 ± 14.2 cm**. The same net trained on 6,000 PilotNet style warps (W) is off by **176.0 ± 9.8 cm**. With 20,000 images and 30 epochs each, renders get to **27.0 ± 1.7 cm** (G_20k) and warps only to **134.8 ± 9.2 cm** (W_20k), so about 5x better with the same amount of data. Everything is mean ± std over 3 seeds.
 
 ![error vs offset](results/plots/error_vs_offset_seeds.png)
 
@@ -59,17 +59,17 @@ On real footage 3 m off the filmed path, the net trained on 6,000 splat renders 
 | G | world A renders (6k) | 3 | 1.9 ± 0.2 | 27.9 ± 2.7 | 56.0 ± 5.4 | 95.5 ± 10.3 |
 | **G2** | world B renders (6k) | 3 | 1.6 ± 0.2 | 23.6 ± 9.8 | 40.3 ± 10.4* | **79.1 ± 14.2** |
 | R | real walks 0 + 2 | 3 | 0.7 ± 0.1 | 10.0 ± 1.2 | 0.7 ± 0.1* | 149.3 ± 5.1 |
-| W_20k | 2D warps (20k, 30 ep) | | pending | | | |
+| W_20k | 2D warps (20k, 30 ep) | 3 | 0.5 ± 0.0 | 2.9 ± 1.6 | 33.5 ± 10.7 | 134.8 ± 9.2 |
 | G_20k | world A renders (20k, 30 ep) | 3 | 0.5 ± 0.1 | 2.8 ± 0.9 | 6.6 ± 0.5 | 27.0 ± 1.7 |
 | G2_20k | world B renders (20k, 30 ep) | 3 | 0.6 ± 0.1 | 2.9 ± 0.8 | 6.5 ± 1.4* | 25.8 ± 4.4 |
-| RG2 | R's real frames + G2 renders | | pending | | | |
+| RG2 | R's real frames + G2 renders | 2 | 1.3 ± 0.7 | 3.9 ± 1.2 | 0.9 ± 0.2* | 47.4 ± 2.4 |
 | G_strict | world A from walk 0 only points | 1 | 1.4 | 29.3 | 61.1 | 100.5 |
 | G_big | world A, splatfacto-big | 1 | 2.0 | 35.4 | 69.1 | 113.5 |
 | G2_big | world B, splatfacto-big | 1 | 1.6 | 28.8 | 49.4 | 88.6 |
 
-\* Not held out, world B and R trained on walk 2.
+\* Not held out, world B, R and RG2 trained on walk 2.
 
-So R is near perfect where it was filmed but falls apart past it (149 cm at 3 m).
+So R is near perfect where it was filmed but falls apart past it (149 cm at 3 m). Mixing R's real frames with G2's renders (RG2) stays accurate near the path and cuts the 3 m error to 47 cm.
 
 **Closed loop** (inside the splat worlds, 10 starts per net per world, `results/closed_loop_summary.csv`, `results/cl_road_summary.csv`)
 
@@ -94,8 +94,7 @@ So R is near perfect where it was filmed but falls apart past it (149 cm at 3 m)
 - Walking, not driving. The phone was at chest height (~1.3 m) and moving at walking speed. A car camera sits at a different height and moves faster.
 - Offsets come from COLMAP, not a tape measure. The metric scale is fitted so the walk spacing matches the nominal 1/2/3 m (`scripts/lane_common.py`).
 - The closed loop runs inside the splat, which is the kind of image the G nets trained on. That favours G since W never saw render artefacts. The real frame table is the fair comparison.
-- The 20k runs had more data and epochs than W, the matched W_20k run is pending.
-- World B and R saw walk 2, so their 1.93 m numbers aren't held out (marked *).
+- World B, R and RG2 saw walk 2, so their 1.93 m numbers aren't held out (marked *).
 - Both walk 0 clips point slightly right, so the splat covers the left edge less. Parked cars may have moved between passes.
 
 ## prior art
