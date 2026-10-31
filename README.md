@@ -22,7 +22,7 @@ To check who's right I filmed real walks 1, 2 and 3 m to the side of the first o
 
 On real footage 3 m off the filmed path, the net trained on 6,000 splat renders from walks 0 + 2 (G2) is off by **79.1 ± 14.2 cm**. The same net trained on 6,000 PilotNet style warps (W) is off by **176.0 ± 9.8 cm**. With 20,000 images and 30 epochs each, renders get to **27.0 ± 1.7 cm** (G_20k) and warps only to **134.8 ± 9.2 cm** (W_20k). Everything is mean ± std over 3 seeds.
 
-**So with the same amount of data, training on the 3D renders makes the net about 5x more accurate than NVIDIA's 2D warps (27 cm vs 135 cm off at 3 m).**
+**So with the same amount of data, training on the 3D renders makes the net about 5x more accurate than NVIDIA's 2D warps (27 cm vs 135 cm off at 3 m, both trained on 20k frames).**
 
 Error on real frames vs distance from the filmed path, lower is better.
 
@@ -72,6 +72,7 @@ Error on real frames vs distance from the filmed path, lower is better.
 | net | trained on | n | 0 m | 0.93 m | 1.93 m | 3.07 m |
 |---|---|---|---|---|---|---|
 | **W** | 2D warps (6k) | 3 | 2.0 ± 0.5 | 24.4 ± 2.0 | 73.9 ± 8.3 | **176.0 ± 9.8** |
+| W_h1.6 | 2D warps (6k), phone height 1.6 m | 1 | 1.9 | 4.0 | 41.8 | 155.3 |
 | G | world A renders (6k) | 3 | 1.9 ± 0.2 | 27.9 ± 2.7 | 56.0 ± 5.4 | 95.5 ± 10.3 |
 | **G2** | world B renders (6k) | 3 | 1.6 ± 0.2 | 23.6 ± 9.8 | 40.3 ± 10.4* | **79.1 ± 14.2** |
 | R | real walks 0 + 2 | 3 | 0.7 ± 0.1 | 10.0 ± 1.2 | 0.7 ± 0.1* | 149.3 ± 5.1 |
@@ -87,7 +88,7 @@ Error on real frames vs distance from the filmed path, lower is better.
 
 So R is near perfect where it was filmed but falls apart past it (149 cm at 3 m). Mixing R's real frames with G2's renders (RG2) stays accurate near the path and cuts the 3 m error to 47 cm.
 
-**So past 1 m the renders beat the warps at every distance, and just filming more (R) only helps where you actually filmed.**
+**So the warp net swings with a phone height you can't measure from the video (at 1.6 m it beats G at 1 m and 2 m), but past about 3 m it collapses at every height while the render nets hold. Just filming more (R) only helps where you actually filmed.**
 
 **Closed loop** (inside the splat worlds, 10 starts per net per world, `results/closed_loop_summary.csv`, `results/cl_road_summary.csv`)
 
